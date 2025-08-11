@@ -1,6 +1,6 @@
 # kautolog
 
-Auto-log **everything you see** in every terminal tab on Kali/Linux using `script(1)` — prompt, commands, output, ANSI colors, and ncurses apps — with optional timing/replay, tmux per-pane logs, logrotate, and rclone cloud sync.
+Auto-log **everything you see** in every terminal tab on Kali/Linux using `script(1)`. Captures prompt, commands, output, ANSI colors, and ncurses apps with optional timing/replay, tmux per-pane logs, logrotate, and rclone cloud sync.
 
 **v1.1.0**: Installs into **both** `~/.bashrc` and `~/.zshrc` by default (so it works on Kali's Zsh and Bash).
 
