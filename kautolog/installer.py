@@ -29,9 +29,9 @@ def _append_unique(file: Path, block: str, marker_start: str, marker_end: str) -
     cur = _read_text(file)
     if marker_start in cur and marker_end in cur:
         return False
-    # ensure exactly one newline before our block (never glue to previous line)
-    if cur and not cur.endswith("\n"):
-        cur = cur + "\n"
+    # ensure exactly one blank line before our block
+    if not cur.endswith("\n\n"):
+        cur = cur.rstrip("\n") + "\n\n"
     new = cur + block.rstrip() + "\n"
     _write_text(file, new)
     return True
