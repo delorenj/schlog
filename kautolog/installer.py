@@ -29,7 +29,10 @@ def _append_unique(file: Path, block: str, marker_start: str, marker_end: str) -
     cur = _read_text(file)
     if marker_start in cur and marker_end in cur:
         return False
-    new = cur.rstrip() + ("\n\n" if cur and not cur.endswith("\n") else "") + block + "\n"
+    # ensure exactly one newline before our block (never glue to previous line)
+    if cur and not cur.endswith("\n"):
+        cur = cur + "\n"
+    new = cur + block.rstrip() + "\n"
     _write_text(file, new)
     return True
 
@@ -106,9 +109,22 @@ def uninstall_systemd_sync() -> None:
     except Exception:
         pass
 
+def install_helpers() -> None:
+    """Install the replay helper to ~/.local/bin."""
+    bin_dir = HOME / ".local" / "bin"
+    bin_dir.mkdir(parents=True, exist_ok=True)
+    src = PKG_DIR / "templates" / "replay"
+    dst = bin_dir / "replay"
+    data = src.read_text(encoding="utf-8")
+    _write_text(dst, data, mode=0o755)
+    if str(bin_dir) not in os.environ.get("PATH", "").split(":"):
+        print(f"[kautolog] Note: {bin_dir} is not on PATH. Add this to your shell rc:")
+        print('  export PATH="$HOME/.local/bin:$PATH"')
+
 def install_all(logdir: Optional[str], enable_tmux: bool, enable_logrotate: bool, rclone_remote: Optional[str], sync_interval_min: int) -> bool:
     try:
         install_rc_files(logdir)
+        install_helpers()
         if enable_tmux:
             install_tmux()
         if enable_logrotate:
@@ -131,6 +147,10 @@ def uninstall_all() -> bool:
         except Exception:
             pass
         uninstall_systemd_sync()
+        try:
+            (HOME / ".local" / "bin" / "replay").unlink(missing_ok=True)
+        except Exception:
+            pass
         print("[kautolog] Uninstalled. Remove ~/terminal-logs if you also want to delete logs.")
         return True
     except Exception as e:
