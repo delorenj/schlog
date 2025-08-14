@@ -1,9 +1,12 @@
 #!/usr/bin/env bash
-
 set -euo pipefail
 
 replay() {
-  local base="$1"; shift || true
+  local base_raw="$1"; shift || true
+  local base="${base_raw%.log}" # remove .log if passed
+  local timing="$(realpath -m "${base}.timing")"
+  local log="$(realpath -m "${base}.log")"
+
   local speed_args=() target= maxdelay=
   while [[ $# -gt 0 ]]; do
     case "$1" in
@@ -13,13 +16,17 @@ replay() {
       *) speed_args+=("$1"); shift ;;
     esac
   done
-  [[ -z "${base:-}" ]] && { echo "usage: replay <basename> [-d N] [--maxdelay SEC] [--target SEC]"; return 2; }
 
-  local timing="${base%.timing}.timing"
-  local log="${base%.log}.log"
+  # Resolve live log path
+  local live_log="$(realpath -m "${logbase:-nonexistent}.log" 2>/dev/null || true)"
+
+  if [[ -n "${logbase:-}" && "$log" == "$live_log" ]]; then
+    echo "❌ Refusing to replay the current live session log due to recursion."
+    return 1
+  fi
+
   [[ -f "$timing" && -f "$log" ]] || { echo "missing files: $timing or $log"; return 1; }
 
-  # total seconds (for --target)
   local total; total="$(awk '{s+=$1} END{print int(s+0.5)}' "$timing")"; (( total<=0 )) && total=1
   if [[ -n "${target:-}" && "$target" -gt 0 ]]; then
     local d=$(( total / target )); (( d<1 )) && d=1
@@ -32,11 +39,9 @@ replay() {
   if [[ -n "${maxdelay:-}" ]]; then cmd+=( --maxdelay "$maxdelay" ); fi
   cmd+=( -t "$timing" "$log" )
 
-  # save/restore without clearing screen
   local saved; saved=$(stty -g 2>/dev/null || true)
   _restore() {
     stty "$saved" 2>/dev/null || true
-    # re-enable line wrap and make cursor visible (no full reset)
     printf '\e[?7h\e[?25h'
     trap - INT EXIT
   }
@@ -48,55 +53,44 @@ replay() {
   "${cmd[@]}"
 
   _restore
-  if [[ -n "${ZSH_VERSION:-}" ]]; then
-    echo -n "Done. Press any key to return..."
-    # zsh: read -k
-    read -k 1 -s
-    echo
-  else
-    # bash: read -n1 -s -r
-    read -n1 -s -r -p "Done. Press any key to return..."; echo
-  fi
-  echo "✅ Back to your shell (no screen reset)."
+  echo
+  echo "✅ Back to your shell."
 }
 
 replay_instant() {
   if [[ -z "${1:-}" ]]; then
-    echo "Usage: replay -i <basename-without-ext>"
-    echo "Example: replay -i ~/terminal-logs/2025/08/10/kali-33608-203123"
+    echo "Usage: replay -i <basename>"
     return 2
   fi
-  local base="$1"
-  local log="${base%.log}.log"
+
+  local base_raw="$1"
+  local base="${base_raw%.log}"
+  local log="$(realpath -m "${base}.log")"
+  local live_log="$(realpath -m "${logbase:-nonexistent}.log" 2>/dev/null || true)"
+
+  if [[ -n "${logbase:-}" && "$log" == "$live_log" ]]; then
+    echo "❌ Refusing to replay the current live session log due to recursion."
+    return 1
+  fi
+
   if [[ ! -f "$log" ]]; then
     echo "Missing: $log"
     return 1
   fi
 
-  # If you try to dump the *current* session's log, copy it first to avoid infinite growth
-  local tmp="" cleanup=0
-  if [[ -n "${logbase:-}" && "$log" == "${logbase}.log" ]]; then
-    tmp="$(mktemp /tmp/kautolog-XXXXXX.log)" || { echo "mktemp failed"; return 1; }
-    cp -- "$log" "$tmp" || { echo "copy failed"; rm -f -- "$tmp"; return 1; }
-    log="$tmp"; cleanup=1
-    echo "(info) Using a frozen copy of the live log to avoid recursion."
-  fi
-
-  # Gentle TTY save/restore (no full screen reset)
   local saved; saved=$(stty -g 2>/dev/null || true)
-  _ri_restore() { stty "$saved" 2>/dev/null || true; printf '\e[?7h\e[?25h'; trap - INT EXIT; }
-  trap _ri_restore INT EXIT
+  _restore() { stty "$saved" 2>/dev/null || true; printf '\e[?7h\e[?25h'; trap - INT EXIT; }
+  trap _restore INT EXIT
 
   echo "Instant dump of: $log"
   cat -- "$log"
 
-  _ri_restore
-  if [[ $cleanup -eq 1 ]]; then rm -f -- "$log"; fi
+  _restore
   echo
   echo "✅ Back to your shell."
 }
 
-# --- dispatcher: `replay [-i] <basename>` ---
+# --- dispatcher ---
 if [[ "${1:-}" == "-i" || "${1:-}" == "--instant" ]]; then
   shift
   replay_instant "$@"
