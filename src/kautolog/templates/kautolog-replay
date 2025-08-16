@@ -2,7 +2,7 @@
 set -euo pipefail
 
 log_error() {
-  echo "❌ $1" >&2
+  echo "$1" >&2
   exit 1
 }
 
@@ -43,7 +43,7 @@ while [[ $# -gt 0 ]]; do
       shift 2
       ;;
     -*)
-      log_error "Unknown option: $1"
+      log_error "❌ Unknown option: $1"
       ;;
     *)
       logbase="$1"
@@ -54,18 +54,14 @@ done
 
 [[ -z "$logbase" ]] && show_usage
 
-# Remove .log if provided
+# Normalize logbase
 base="${logbase%.log}"
 log="$(realpath -m "${base}.log")"
 timing="$(realpath -m "${base}.timing")"
 
-# Prevent recursion: compare against the current session's live log if set
-if [[ -n "${logbase:-}" && -n "${logbase+x}" ]]; then
-  current_logbase="${logbase:-}"
-  current_live="$(realpath -m "${current_logbase}.log" 2>/dev/null || true)"
-  if [[ "$log" == "$current_live" ]]; then
-    log_error "❌ Refusing to replay the current live session log due to recursion."
-  fi
+# Detect recursion by comparing basename to current logbase env
+if [[ -n "${logbase:-}" && -n "${logbase##*/}" && "${logbase##*/}" == "${base##*/}" ]]; then
+  log_error "❌ Refusing to replay the current live session log due to recursion."
 fi
 
 saved=$(stty -g 2>/dev/null || true)
@@ -78,11 +74,11 @@ _restore() {
 trap _restore INT EXIT
 
 if [[ "$instant" -eq 1 ]]; then
-  [[ -f "$log" ]] || log_error "Missing: $log"
+  [[ -f "$log" ]] || log_error "❌ Missing: $log"
   echo "Instant dump of: $log"
   cat -- "$log"
 else
-  [[ -f "$log" && -f "$timing" ]] || log_error "Missing: $log or $timing"
+  [[ -f "$log" && -f "$timing" ]] || log_error "❌ Missing: $log or $timing"
   total=$(awk '{s+=$1} END{print int(s+0.5)}' "$timing" || echo 1)
   (( total<=0 )) && total=1
   if [[ -n "$target" && "$target" -gt 0 ]]; then
