@@ -1,5 +1,7 @@
 # kautolog
 
+[![PyPI version](https://img.shields.io/pypi/v/kautolog.svg)](https://pypi.org/project/kautolog/)
+
 Auto-log **everything you see** in every terminal tab on Kali/Linux using `script(1)`. Captures prompt, commands, output, ANSI colors, and ncurses apps with optional timing/replay, tmux per-pane logs, logrotate, and rclone cloud sync.
 
 ## Install
