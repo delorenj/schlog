@@ -43,6 +43,8 @@ replay() {
   _restore() {
     stty "$saved" 2>/dev/null || true
     printf '\e[?7h\e[?25h'
+    echo
+    echo "✅ Back to your shell."
     trap - INT EXIT
   }
   trap _restore INT EXIT
@@ -79,7 +81,11 @@ replay_instant() {
   fi
 
   local saved; saved=$(stty -g 2>/dev/null || true)
-  _restore() { stty "$saved" 2>/dev/null || true; printf '\e[?7h\e[?25h'; trap - INT EXIT; }
+  _restore() {
+    stty "$saved" 2>/dev/null || true
+    printf '\e[?7h\e[?25h'
+    trap - INT EXIT;
+  }
   trap _restore INT EXIT
 
   echo "Instant dump of: $log"
