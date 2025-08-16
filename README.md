@@ -22,7 +22,7 @@ kautolog install --with-tmux --with-sync remote:terminal-logs --interval 10
 This will:
 
 - Hook into both `~/.bashrc` and `~/.zshrc` for Zsh and Bash auto-logging.
-- Install replay script into `~/.local/bin`.
+- Install kautolog-replay script into `~/.local/bin`.
 
 ## Replaying logs
 
