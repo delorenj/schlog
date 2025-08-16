@@ -110,11 +110,11 @@ def uninstall_systemd_sync() -> None:
         pass
 
 def install_helpers() -> None:
-    """Install the replay helper to ~/.local/bin."""
+    """Install the kautolog-replay helper to ~/.local/bin."""
     bin_dir = HOME / ".local" / "bin"
     bin_dir.mkdir(parents=True, exist_ok=True)
-    src = PKG_DIR / "templates" / "replay"
-    dst = bin_dir / "replay"
+    src = PKG_DIR / "templates" / "kautolog-replay"
+    dst = bin_dir / "kautolog-replay"
     data = src.read_text(encoding="utf-8")
     _write_text(dst, data, mode=0o755)
     if str(bin_dir) not in os.environ.get("PATH", "").split(":"):
@@ -148,7 +148,7 @@ def uninstall_all() -> bool:
             pass
         uninstall_systemd_sync()
         try:
-            (HOME / ".local" / "bin" / "replay").unlink(missing_ok=True)
+            (HOME / ".local" / "bin" / "kautolog-replay").unlink(missing_ok=True)
         except Exception:
             pass
         print("[kautolog] Uninstalled. Remove ~/terminal-logs if you also want to delete logs.")

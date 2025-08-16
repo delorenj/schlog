@@ -31,7 +31,7 @@ include-package-data = true
 "kautolog" = [
     "templates/*.sh",
     "templates/*.conf",
-    "templates/replay",
+    "templates/kautolog-replay",
     "templates/logrotate_terminal-logs",
     "templates/systemd/*.service",
     "templates/systemd/*.timer"

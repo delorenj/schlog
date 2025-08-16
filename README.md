@@ -29,13 +29,13 @@ This will:
 To replay a session with timing:
 
 ```bash
-replay ~/terminal-logs/2025/08/10/kali-33608-203123
+kautolog -r ~/terminal-logs/2025/08/10/kali-33608-203123
 ```
 
 To instantly dump the log without delay:
 
 ```bash
-replay -i ~/terminal-logs/2025/08/10/kali-33608-203123
+kautolog -i ~/terminal-logs/2025/08/10/kali-33608-203123
 ```
 
 ## Uninstall
