@@ -44,6 +44,12 @@ kautolog uninstall
 
 Removes all shell hooks and scripts cleanly.
 
+If you installed using pipx:
+
+```bash
+pipx uninstall kautolog
+```
+
 ## Log Format
 
 Logs are saved to:
