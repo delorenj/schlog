@@ -54,12 +54,19 @@ done
 
 [[ -z "$logbase" ]] && show_usage
 
+# Remove .log if provided
 base="${logbase%.log}"
 log="$(realpath -m "${base}.log")"
 timing="$(realpath -m "${base}.timing")"
-live_log="$(realpath -m "${logbase:-nonexistent}.log" 2>/dev/null || true)"
 
-[[ -n "${logbase:-}" && "$log" == "$live_log" ]] && log_error "❌ Refusing to replay the current live session log due to recursion."
+# Prevent recursion: compare against the current session's live log if set
+if [[ -n "${logbase:-}" && -n "${logbase+x}" ]]; then
+  current_logbase="${logbase:-}"
+  current_live="$(realpath -m "${current_logbase}.log" 2>/dev/null || true)"
+  if [[ "$log" == "$current_live" ]]; then
+    log_error "❌ Refusing to replay the current live session log due to recursion."
+  fi
+fi
 
 saved=$(stty -g 2>/dev/null || true)
 _restore() {
