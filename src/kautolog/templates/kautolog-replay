@@ -9,7 +9,7 @@ log_error() {
 show_usage() {
   echo "Usage:"
   echo "  kautolog replay <log_base>        # Replays with timing"
-  echo "  kautolog replay --instant <log_base>     # Instantly dumps log without timing"
+  echo "  kautolog replay -i <log_base>     # Instantly dumps log without timing"
   echo "Options:"
   echo "  -d <speed>        scriptreplay speed delay"
   echo "  -m <maxdelay>     Max delay between lines"
@@ -26,7 +26,7 @@ logbase=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    --instant)
+    -i)
       instant=1
       shift
       ;;
@@ -57,12 +57,9 @@ done
 base="${logbase%.log}"
 log="$(realpath -m "${base}.log")"
 timing="$(realpath -m "${base}.timing")"
+live_log="$(realpath -m "${logbase:-nonexistent}.log" 2>/dev/null || true)"
 
-# Detect recursion only if logbase matches current session
-if [[ -n "${logbase:-}" && -n "${logbase_env:-}" ]]; then
-  live_log="$(realpath -m "${logbase_env}.log" 2>/dev/null || true)"
-  [[ "$log" == "$live_log" ]] && log_error "❌ Refusing to replay the current live session log due to recursion."
-fi
+[[ -n "${logbase:-}" && "$log" == "$live_log" ]] && log_error "❌ Refusing to replay the current live session log due to recursion."
 
 saved=$(stty -g 2>/dev/null || true)
 _restore() {
@@ -81,7 +78,6 @@ else
   [[ -f "$log" && -f "$timing" ]] || log_error "Missing: $log or $timing"
   total=$(awk '{s+=$1} END{print int(s+0.5)}' "$timing" || echo 1)
   (( total<=0 )) && total=1
-
   if [[ -n "$target" && "$target" -gt 0 ]]; then
     d=$(( total / target ))
     (( d<1 )) && d=1

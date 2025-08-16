@@ -38,14 +38,18 @@ def status():
 @app.command()
 def replay(
     log_base: str = typer.Argument(..., help="Path to .log or base filename (no extension)"),
-    instant: bool = typer.Option(False, "-i", "--instant", help="Instant dump of log (no timing)"),
+    instant: bool = typer.Option(False, "-i", help="Instant dump of log (no timing)"),
     d: Optional[str] = typer.Option(None, "-d", help="scriptreplay delay"),
     m: Optional[str] = typer.Option(None, "--maxdelay", "-m", help="Max delay between lines"),
     target: Optional[int] = typer.Option(None, "--target", help="Target duration in seconds"),
 ):
     """Replay or dump a terminal session log."""
     args = []
-    args += ["-i" if instant else "-r", log_base]
+
+    if instant:
+        args.append("-i")
+
+    args.append(log_base)
 
     if d:
         args += ["-d", d]
