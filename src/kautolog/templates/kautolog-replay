@@ -8,17 +8,16 @@ log_error() {
 
 show_usage() {
   echo "Usage:"
-  echo "  kautolog -r <log_base>        # Replays with timing"
-  echo "  kautolog -i <log_base>        # Instantly dumps log without timing"
+  echo "  kautolog replay <log_base>        # Replays with timing"
+  echo "  kautolog replay --instant <log_base>     # Instantly dumps log without timing"
   echo "Options:"
-  echo "  -d <speed>        Scriptreplay speed delay"
+  echo "  -d <speed>        scriptreplay speed delay"
   echo "  -m <maxdelay>     Max delay between lines"
   echo "  --target <secs>   Target duration in seconds"
   exit 1
 }
 
 # --- args ---
-replay=0
 instant=0
 speed_args=()
 maxdelay=""
@@ -27,11 +26,7 @@ logbase=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
-    -r|--replay)
-      replay=1
-      shift
-      ;;
-    -i|--instant)
+    --instant)
       instant=1
       shift
       ;;
@@ -58,14 +53,16 @@ while [[ $# -gt 0 ]]; do
 done
 
 [[ -z "$logbase" ]] && show_usage
-[[ "$replay" -eq 0 && "$instant" -eq 0 ]] && show_usage
 
 base="${logbase%.log}"
 log="$(realpath -m "${base}.log")"
 timing="$(realpath -m "${base}.timing")"
-live_log="$(realpath -m "${logbase:-nonexistent}.log" 2>/dev/null || true)"
 
-[[ -n "${logbase:-}" && "$log" == "$live_log" ]] && log_error "❌ Refusing to replay the current live session log due to recursion."
+# Detect recursion only if logbase matches current session
+if [[ -n "${logbase:-}" && -n "${logbase_env:-}" ]]; then
+  live_log="$(realpath -m "${logbase_env}.log" 2>/dev/null || true)"
+  [[ "$log" == "$live_log" ]] && log_error "❌ Refusing to replay the current live session log due to recursion."
+fi
 
 saved=$(stty -g 2>/dev/null || true)
 _restore() {
@@ -84,6 +81,7 @@ else
   [[ -f "$log" && -f "$timing" ]] || log_error "Missing: $log or $timing"
   total=$(awk '{s+=$1} END{print int(s+0.5)}' "$timing" || echo 1)
   (( total<=0 )) && total=1
+
   if [[ -n "$target" && "$target" -gt 0 ]]; then
     d=$(( total / target ))
     (( d<1 )) && d=1
