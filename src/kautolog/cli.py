@@ -6,34 +6,6 @@ from .installer import install_all, uninstall_all, get_status
 
 app = typer.Typer(add_completion=False, help="Auto-log all terminal sessions on Kali/Linux using script(1).")
 
-@app.callback()
-def replay_callback(
-    r: Optional[str] = typer.Option(None, "--replay", "-r", help="Replay a session with timing."),
-    i: Optional[str] = typer.Option(None, "--instant", "-i", help="Instantly dump a session log."),
-    d: Optional[str] = typer.Option(None, "-d", help="scriptreplay speed delay."),
-    m: Optional[str] = typer.Option(None, "--maxdelay", "-m", help="Maximum delay between lines."),
-    target: Optional[int] = typer.Option(None, "--target", help="Target duration in seconds."),
-):
-    """Top-level flags to invoke replay or instant dump functionality."""
-    if not r and not i:
-        return  # Continue to other commands (install, uninstall, status)
-
-    args = []
-    if r:
-        args += ["-r", r]
-    if i:
-        args += ["-i", i]
-    if d:
-        args += ["-d", d]
-    if m:
-        args += ["-m", m]
-    if target:
-        args += ["--target", str(target)]
-
-    replay_script = str(Path.home() / ".local/bin/kautolog-replay")
-    subprocess.run([replay_script] + args, check=False)
-    raise typer.Exit()
-
 @app.command()
 def install(
     logdir: Optional[str] = typer.Option(None, help="Log directory (default: ~/terminal-logs)"),
@@ -62,3 +34,25 @@ def uninstall():
 def status():
     """Show install status and recent logs."""
     print(get_status())
+
+@app.command()
+def replay(
+    log_base: str = typer.Argument(..., help="Path to .log or base filename (no extension)"),
+    instant: bool = typer.Option(False, "-i", "--instant", help="Instant dump of log (no timing)"),
+    d: Optional[str] = typer.Option(None, "-d", help="scriptreplay delay"),
+    m: Optional[str] = typer.Option(None, "--maxdelay", "-m", help="Max delay between lines"),
+    target: Optional[int] = typer.Option(None, "--target", help="Target duration in seconds"),
+):
+    """Replay or dump a terminal session log."""
+    args = []
+    args += ["-i" if instant else "-r", log_base]
+
+    if d:
+        args += ["-d", d]
+    if m:
+        args += ["--maxdelay", m]
+    if target:
+        args += ["--target", str(target)]
+
+    replay_script = str(Path.home() / ".local/bin/kautolog-replay")
+    subprocess.run([replay_script] + args, check=False)
