@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "kautolog"
-version = "1.1.1"
+version = "1.1.2"
 description = "Kali/Linux auto-logging of all terminal sessions using script(1), with optional tmux, logrotate, and rclone sync."
 readme = "README.md"
 requires-python = ">=3.8"
