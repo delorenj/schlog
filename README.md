@@ -36,13 +36,13 @@ To instantly dump the log without delay:
 replay -i ~/terminal-logs/2025/08/10/kali-33608-203123
 ```
 
-Removes all shell hooks and scripts cleanly.
-
 ## Uninstall
 
 ```bash
 kautolog uninstall
 ```
+
+Removes all shell hooks and scripts cleanly.
 
 ## Log Format
 
