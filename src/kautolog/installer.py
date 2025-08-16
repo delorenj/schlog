@@ -131,7 +131,7 @@ def install_all(logdir: Optional[str], enable_tmux: bool, enable_logrotate: bool
             install_logrotate(logdir)
         if rclone_remote:
             install_systemd_sync(logdir, rclone_remote, sync_interval_min)
-        print("[kautolog] Installed. Open a new terminal tab to start logging (Zsh and Bash).")
+        print("[kautolog] Installed. Open a new terminal session to start logging (Zsh or Bash).")
         return True
     except Exception as e:
         print(f"[kautolog] Install error: {e}", file=sys.stderr)
