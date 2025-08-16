@@ -2,20 +2,59 @@
 
 Auto-log **everything you see** in every terminal tab on Kali/Linux using `script(1)`. Captures prompt, commands, output, ANSI colors, and ncurses apps with optional timing/replay, tmux per-pane logs, logrotate, and rclone cloud sync.
 
-**v1.1.0**: Installs into **both** `~/.bashrc` and `~/.zshrc` by default (so it works on Kali's Zsh and Bash).
-
 ## Install
-```
+
+Recommended:
+
+```bash
 pipx install kautolog
 kautolog install
-# or add extras
+```
+
+With extras:
+
+```bash
 kautolog install --with-tmux --with-sync remote:terminal-logs --interval 10
 ```
-Uninstall:
+
+This will:
+
+- Hook into both `~/.bashrc` and `~/.zshrc` for Zsh and Bash auto-logging.
+- Install replay script into `~/.local/bin`.
+
+## Replaying logs
+
+To replay a session with timing:
+
+```bash
+replay ~/terminal-logs/2025/08/10/kali-33608-203123
 ```
+
+To instantly dump the log without delay:
+
+```bash
+replay -i ~/terminal-logs/2025/08/10/kali-33608-203123
+```
+
+Removes all shell hooks and scripts cleanly.
+
+## Uninstall
+
+```bash
 kautolog uninstall
 ```
 
-## Notes
-- Works for tabs/windows/SSH. Passwords you type are not logged (not echoed).
-- Zsh logging uses a `precmd()` hook to timestamp commands similar to Bash's `PROMPT_COMMAND`.
+## Log Format
+
+Logs are saved to:
+
+```bash
+~/terminal-logs/YYYY/MM/DD/hostname-PID-TIMESTAMP.log
+~/terminal-logs/YYYY/MM/DD/hostname-PID-TIMESTAMP.timing
+```
+
+If `--with-tmux` is used, each tmux pane logs independently.
+
+## License
+
+The scripts and documentation in this project are released under the [MIT License](https://github.com/marksowell/kautolog/blob/main/LICENSE)
