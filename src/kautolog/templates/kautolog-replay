@@ -68,8 +68,8 @@ else
 fi
 
 # --- Debug output ---
-echo "🔍 [DEBUG] Requested replay log: $log"
-echo "🔍 [DEBUG] Current live session log: $live_log"
+# echo "🔍 [DEBUG] Requested replay log: $log"
+# echo "🔍 [DEBUG] Current live session log: $live_log"
 
 # --- Prevent recursion ---
 if [[ -n "$live_log" && "$log" == "$live_log" ]]; then
