@@ -22,7 +22,7 @@ instant=0
 speed_args=()
 maxdelay=""
 target=""
-logbase=""
+replay_arg=""
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
@@ -46,22 +46,35 @@ while [[ $# -gt 0 ]]; do
       log_error "❌ Unknown option: $1"
       ;;
     *)
-      logbase="$1"
+      replay_arg="$1"
       shift
       ;;
   esac
 done
 
-[[ -z "$logbase" ]] && show_usage
+[[ -z "$replay_arg" ]] && show_usage
 
-# Normalize logbase
-base="${logbase%.log}"
+# --- Normalize replay target ---
+base="${replay_arg%.log}"
 log="$(realpath -m "${base}.log")"
 timing="$(realpath -m "${base}.timing")"
 
-# Detect recursion by comparing basename to current logbase env
-if [[ -n "${logbase:-}" && -n "${logbase##*/}" && "${logbase##*/}" == "${base##*/}" ]]; then
-  log_error "❌ Refusing to replay the current live session log due to recursion."
+# --- Resolve current live session log, if defined ---
+live_log="${logbase:-}"
+if [[ -n "$live_log" ]]; then
+  live_log="$(realpath -m "${live_log}.log" 2>/dev/null || true)"
+else
+  live_log=""
+fi
+
+# --- Debug output ---
+echo "🔍 [DEBUG] Requested replay log: $log"
+echo "🔍 [DEBUG] Current live session log: $live_log"
+
+# --- Prevent recursion ---
+if [[ -n "$live_log" && "$log" == "$live_log" ]]; then
+  echo "❌ Refusing to replay the current live session log due to recursion."
+  exit 1
 fi
 
 saved=$(stty -g 2>/dev/null || true)
@@ -69,6 +82,7 @@ _restore() {
   stty "$saved" 2>/dev/null || true
   printf '\e[?7h\e[?25h'
   echo
+  echo "✅ Back to your shell."
   trap - INT EXIT
 }
 trap _restore INT EXIT
@@ -100,4 +114,3 @@ else
 fi
 
 _restore
-echo "✅ Back to your shell."
