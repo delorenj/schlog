@@ -48,7 +48,7 @@ kautolog replay -i ~/terminal-logs/2025/08/10/kali-33608-203123
 |------------|-------------|-------|
 | `<log_base>` | Path to `.log` file or base name (no extension) | Required |
 | `-i` | Instant dump (no timing) | Just prints the `.log` file |
-| `-d <num>` | Speed multiplier (**divisor**) | `-d 2` = 2× faster, `-d 10` = 10× faster, `-d 0.5` = 2× slower |
+| `-d <num>` | Speed divisor (multiplier) | `-d 2` = 2× faster, `-d 10` = 10× faster, `-d 0.5` = 2× slower |
 | `-m <secs>`, `--maxdelay <secs>` | Maximum delay between lines | Clamps long pauses (e.g. `-m 0.1`) |
 | `--target <secs>` | Normalize total replay to target duration | Auto-computes divisor; also sets `--maxdelay 0.12` if not provided |
 
