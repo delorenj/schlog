@@ -28,28 +28,6 @@ This will:
 | `--with-sync remote:path` | *(none)* | Enable rclone sync (e.g. `gdrive:kautolog-logs`) |
 | `--interval N` | `10` | Sync interval in minutes for systemd timer |
 
-### Enabling Automatic Log Cleanup
-
-By default, `kautolog install` places a logrotate config at:
-
-```bash
-~/.config/logrotate.d/terminal-logs
-```
-
-Most systems **do not run** logrotate from this location.  
-To enable automatic log cleanup, copy it to the system logrotate directory:
-
-```bash
-sudo cp ~/.config/logrotate.d/terminal-logs /etc/logrotate.d/terminal-logs
-```
-
-This will:
-
-- Rotate logs daily
-- Keep 14 days of logs
-- Compress old logs
-- Prevent unlimited disk usage
-
 ## Replaying logs
 
 To replay a session with timing:
@@ -74,6 +52,39 @@ kautolog replay -i ~/terminal-logs/2025/08/10/kali-33608-203123
 | `-m <secs>`, `--maxdelay <secs>` | Maximum delay between lines | Clamps long pauses (e.g. `-m 0.1`) |
 | `--target <secs>` | Normalize total replay to target duration | Auto-computes divisor; also sets `--maxdelay 0.12` if not provided |
 
+## Log Format
+
+Logs are saved to:
+
+```bash
+~/terminal-logs/YYYY/MM/DD/hostname-PID-TIMESTAMP.log
+~/terminal-logs/YYYY/MM/DD/hostname-PID-TIMESTAMP.timing
+```
+
+If `--with-tmux` is used, each tmux pane logs independently.
+
+## Enabling Automatic Log Cleanup (Optional)
+
+By default, `kautolog install` places a logrotate config at:
+
+```bash
+~/.config/logrotate.d/terminal-logs
+```
+
+Most systems **do not run** logrotate from this location.  
+To enable automatic log cleanup, copy it to the system logrotate directory:
+
+```bash
+sudo cp ~/.config/logrotate.d/terminal-logs /etc/logrotate.d/terminal-logs
+```
+
+This will:
+
+- Rotate logs daily
+- Keep 14 days of logs
+- Compress old logs
+- Prevent unlimited disk usage
+
 ## Uninstall
 
 ```bash
@@ -87,17 +98,6 @@ If you installed using pipx:
 ```bash
 pipx uninstall kautolog
 ```
-
-## Log Format
-
-Logs are saved to:
-
-```bash
-~/terminal-logs/YYYY/MM/DD/hostname-PID-TIMESTAMP.log
-~/terminal-logs/YYYY/MM/DD/hostname-PID-TIMESTAMP.timing
-```
-
-If `--with-tmux` is used, each tmux pane logs independently.
 
 ## License
 
