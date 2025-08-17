@@ -39,7 +39,7 @@ def status():
 def replay(
     log_base: str = typer.Argument(..., help="Path to .log or base filename (no extension)"),
     instant: bool = typer.Option(False, "-i", help="Instant dump of log (no timing)"),
-    d: Optional[str] = typer.Option(None, "-d", help="scriptreplay delay"),
+    d: Optional[str] = typer.Option(None, "-d", help="scriptreplay speed divisor (multiplier)"),
     m: Optional[str] = typer.Option(None, "--maxdelay", "-m", help="Max delay between lines"),
     target: Optional[int] = typer.Option(None, "--target", help="Target duration in seconds"),
 ):

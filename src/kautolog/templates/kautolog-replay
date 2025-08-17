@@ -11,7 +11,7 @@ show_usage() {
   echo "  kautolog replay <log_base>        # Replays with timing"
   echo "  kautolog replay -i <log_base>     # Instantly dumps log without timing"
   echo "Options:"
-  echo "  -d <speed>        scriptreplay speed delay"
+  echo "  -d <speed>        scriptreplay speed divisor (multiplier)"
   echo "  -m <maxdelay>     Max delay between lines"
   echo "  --target <secs>   Target duration in seconds"
   exit 1
