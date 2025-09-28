@@ -3,23 +3,24 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "kautolog"
-version = "1.1.14"
-description = "Kali/Linux auto-logging of all terminal sessions using script(1), with optional tmux, logrotate, and rclone sync."
+name = "schlog"
+version = "0.1.0"
+description = "Terminal session auto-logging with script(1), tmux integration, logrotate, and cloud sync capabilities."
 readme = "README.md"
 requires-python = ">=3.8"
-authors = [{name = "Mark Sowell", email = "mark@marksowell.com"}]
+authors = [{name = "Jarad DeLorenzo", email = "jaradd@gmail.com"}]
 dependencies = ["typer>=0.12.0"]
-keywords = ["kali", "linux", "logging", "terminal", "script", "tmux", "logrotate", "rclone"]
+keywords = ["terminal", "logging", "session", "script", "tmux", "logrotate", "rclone", "linux"]
 license = "MIT"
 license-files = ["LICEN[CS]E*"]
 
 [project.urls]
-Homepage = "https://github.com/marksowell/kautolog"
-Issues = "https://github.com/marksowell/kautolog/issues"
+Homepage = "https://delorenj.github.io"
+Repository = "https://github.com/delorenj/schlog"
+Issues = "https://github.com/delorenj/schlog/issues"
 
 [project.scripts]
-kautolog = "kautolog.cli:app"
+schlog = "schlog.cli:app"
 
 [tool.setuptools]
 include-package-data = true
@@ -28,10 +29,10 @@ include-package-data = true
 "" = "src"
 
 [tool.setuptools.package-data]
-"kautolog" = [
+"schlog" = [
     "templates/*.sh",
     "templates/*.conf",
-    "templates/kautolog-replay",
+    "templates/schlog-replay",
     "templates/logrotate_terminal-logs",
     "templates/systemd/*.service",
     "templates/systemd/*.timer"

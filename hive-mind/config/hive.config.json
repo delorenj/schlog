@@ -1,0 +1,65 @@
+{
+  "hive_mind": {
+    "version": "1.0.0",
+    "swarm": {
+      "id": "swarm_1759064338640_bp33kqvsc",
+      "topology": "mesh",
+      "max_agents": 12,
+      "strategy": "adaptive"
+    },
+    "agents": [
+      {
+        "id": "agent_1759064361477_9thikr",
+        "name": "hive-coordinator-alpha",
+        "type": "coordinator",
+        "capabilities": ["swarm-coordination", "task-distribution", "consensus-building", "memory-sync"]
+      },
+      {
+        "id": "agent_1759064361518_n1gh6l",
+        "name": "hive-analyst-beta",
+        "type": "analyst",
+        "capabilities": ["pattern-recognition", "data-analysis", "performance-metrics", "bottleneck-detection"]
+      },
+      {
+        "id": "agent_1759064361566_28le6t",
+        "name": "hive-optimizer-gamma",
+        "type": "optimizer",
+        "capabilities": ["resource-allocation", "topology-optimization", "load-balancing", "efficiency-tuning"]
+      },
+      {
+        "id": "agent_1759064361608_co06jq",
+        "name": "hive-memory-delta",
+        "type": "specialist",
+        "capabilities": ["collective-memory", "knowledge-persistence", "context-preservation", "cross-session-sync"]
+      },
+      {
+        "id": "agent_1759064361653_wzozu3",
+        "name": "hive-architect-epsilon",
+        "type": "architect",
+        "capabilities": ["system-design", "protocol-definition", "interface-creation", "integration-planning"]
+      },
+      {
+        "id": "agent_1759064361700_dwux30",
+        "name": "hive-monitor-zeta",
+        "type": "monitor",
+        "capabilities": ["health-monitoring", "error-detection", "self-healing", "alert-management"]
+      }
+    ],
+    "protocols": {
+      "consensus": "byzantine-fault-tolerant",
+      "communication": "gossip-protocol",
+      "memory": "distributed-hash-table",
+      "coordination": "emergent-behavior"
+    },
+    "namespaces": [
+      "hive-mind",
+      "hive-collective",
+      "hive-protocols"
+    ],
+    "neural": {
+      "model_id": "model_coordination_1759064382203",
+      "pattern": "coordination",
+      "accuracy": 0.683
+    }
+  }
+}

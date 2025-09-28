@@ -8,8 +8,8 @@ log_error() {
 
 show_usage() {
   echo "Usage:"
-  echo "  kautolog replay <log_base>        # Replays with timing"
-  echo "  kautolog replay -i <log_base>     # Instantly dumps log without timing"
+  echo "  schlog replay <log_base>        # Replays with timing"
+  echo "  schlog replay -i <log_base>     # Instantly dumps log without timing"
   echo "Options:"
   echo "  -d <speed>        Speed divisor (multiplier)"
   echo "  -m <maxdelay>     Max delay between lines"

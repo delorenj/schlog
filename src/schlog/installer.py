@@ -11,8 +11,8 @@ CONFIG_DIR = HOME / ".config"
 LOGROTATE_USER_DIR = CONFIG_DIR / "logrotate.d"
 SYSTEMD_USER_DIR = CONFIG_DIR / "systemd" / "user"
 
-MARKER_START = "# >>> KAUTOLOG START >>>"
-MARKER_END   = "# <<< KAUTOLOG END <<<"
+MARKER_START = "# >>> SCHLOG START >>>"
+MARKER_END   = "# <<< SCHLOG END <<<"
 
 def _read_text(path: Path) -> str:
     try:
@@ -50,11 +50,11 @@ def install_rc_files(logdir: Optional[str]) -> None:
         logdir = str(HOME / "terminal-logs")
     # Bash
     bash_block = (PKG_DIR / "templates" / "bashrc_autologger.sh").read_text(encoding="utf-8")
-    bash_block = bash_block.replace("__KAUTOLOG_LOGDIR__", shlex.quote(str(Path(logdir).expanduser())))
+    bash_block = bash_block.replace("__SCHLOG_LOGDIR__", shlex.quote(str(Path(logdir).expanduser())))
     _append_unique(BASHRC, bash_block, MARKER_START, MARKER_END)
     # Zsh
     zsh_block = (PKG_DIR / "templates" / "zshrc_autologger.sh").read_text(encoding="utf-8")
-    zsh_block = zsh_block.replace("__KAUTOLOG_LOGDIR__", shlex.quote(str(Path(logdir).expanduser())))
+    zsh_block = zsh_block.replace("__SCHLOG_LOGDIR__", shlex.quote(str(Path(logdir).expanduser())))
     _append_unique(ZSHRC, zsh_block, MARKER_START, MARKER_END)
 
 def install_tmux() -> None:
@@ -66,7 +66,7 @@ def install_logrotate(logdir: Optional[str]) -> None:
         logdir = str(HOME / "terminal-logs")
     absdir = str(Path(logdir).expanduser().resolve())
     tpl = (PKG_DIR / "templates" / "logrotate_terminal-logs").read_text(encoding="utf-8")
-    tpl = tpl.replace("__KAUTOLOG_ABS_LOGDIR__", absdir).replace("__USER__", os.environ.get("USER", "user"))
+    tpl = tpl.replace("__SCHLOG_ABS_LOGDIR__", absdir).replace("__USER__", os.environ.get("USER", "user"))
     _write_text(LOGROTATE_USER_DIR / "terminal-logs", tpl)
 
 def _systemd_available() -> bool:
@@ -78,7 +78,7 @@ def _systemd_available() -> bool:
 
 def install_systemd_sync(logdir: Optional[str], remote: str, interval_min: int) -> None:
     if not _systemd_available():
-        print("[kautolog] systemd --user unavailable; skipping sync timer.", file=sys.stderr)
+        print("[schlog] systemd --user unavailable; skipping sync timer.", file=sys.stderr)
         return
     if logdir is None:
         logdir = str(HOME / "terminal-logs")
@@ -87,8 +87,8 @@ def install_systemd_sync(logdir: Optional[str], remote: str, interval_min: int) 
     service_tpl = (PKG_DIR / "templates" / "systemd" / "autologger-rclone-sync.service").read_text(encoding="utf-8")
     timer_tpl = (PKG_DIR / "templates" / "systemd" / "autologger-rclone-sync.timer").read_text(encoding="utf-8")
 
-    service = service_tpl.replace("__KAUTOLOG_ABS_LOGDIR__", absdir).replace("__KAUTOLOG_REMOTE__", remote)
-    timer = timer_tpl.replace("__KAUTOLOG_INTERVAL__", str(interval_min))
+    service = service_tpl.replace("__SCHLOG_ABS_LOGDIR__", absdir).replace("__SCHLOG_REMOTE__", remote)
+    timer = timer_tpl.replace("__SCHLOG_INTERVAL__", str(interval_min))
 
     service_path = SYSTEMD_USER_DIR / "autologger-rclone-sync.service"
     timer_path = SYSTEMD_USER_DIR / "autologger-rclone-sync.timer"
@@ -110,15 +110,15 @@ def uninstall_systemd_sync() -> None:
         pass
 
 def install_helpers() -> None:
-    """Install the kautolog-replay helper to ~/.local/bin."""
+    """Install the schlog-replay helper to ~/.local/bin."""
     bin_dir = HOME / ".local" / "bin"
     bin_dir.mkdir(parents=True, exist_ok=True)
-    src = PKG_DIR / "templates" / "kautolog-replay"
-    dst = bin_dir / "kautolog-replay"
+    src = PKG_DIR / "templates" / "schlog-replay"
+    dst = bin_dir / "schlog-replay"
     data = src.read_text(encoding="utf-8")
     _write_text(dst, data, mode=0o755)
     if str(bin_dir) not in os.environ.get("PATH", "").split(":"):
-        print(f"[kautolog] Note: {bin_dir} is not on PATH. Add this to your shell rc:")
+        print(f"[schlog] Note: {bin_dir} is not on PATH. Add this to your shell rc:")
         print('  export PATH="$HOME/.local/bin:$PATH"')
 
 def install_all(logdir: Optional[str], enable_tmux: bool, enable_logrotate: bool, rclone_remote: Optional[str], sync_interval_min: int) -> bool:
@@ -131,10 +131,10 @@ def install_all(logdir: Optional[str], enable_tmux: bool, enable_logrotate: bool
             install_logrotate(logdir)
         if rclone_remote:
             install_systemd_sync(logdir, rclone_remote, sync_interval_min)
-        print("[kautolog] Installed. Open a new terminal session to start logging (Zsh or Bash).")
+        print("[schlog] Installed. Open a new terminal session to start logging (Zsh or Bash).")
         return True
     except Exception as e:
-        print(f"[kautolog] Install error: {e}", file=sys.stderr)
+        print(f"[schlog] Install error: {e}", file=sys.stderr)
         return False
 
 def uninstall_all() -> bool:
@@ -148,18 +148,18 @@ def uninstall_all() -> bool:
             pass
         uninstall_systemd_sync()
         try:
-            (HOME / ".local" / "bin" / "kautolog-replay").unlink(missing_ok=True)
+            (HOME / ".local" / "bin" / "schlog-replay").unlink(missing_ok=True)
         except Exception:
             pass
-        print("[kautolog] Uninstalled. Remove ~/terminal-logs if you also want to delete logs.")
+        print("[schlog] Uninstalled. Remove ~/terminal-logs if you also want to delete logs.")
         return True
     except Exception as e:
-        print(f"[kautolog] Uninstall error: {e}", file=sys.stderr)
+        print(f"[schlog] Uninstall error: {e}", file=sys.stderr)
         return False
 
 def get_status() -> str:
     lines = []
-    lines.append("kautolog status")
+    lines.append("schlog status")
     try:
         bashrc_txt = BASHRC.read_text(encoding="utf-8", errors="ignore")
         lines.append(f"bashrc: {'present' if MARKER_START in bashrc_txt else 'absent'}")

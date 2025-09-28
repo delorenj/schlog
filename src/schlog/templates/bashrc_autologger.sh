@@ -1,8 +1,8 @@
-# >>> KAUTOLOG START >>>
+# >>> SCHLOG START >>>
 # Auto logging (text + timing) for every interactive Bash shell
 if [[ $- == *i* ]] && [[ -t 1 ]] && [[ -z "$UNDER_SCRIPT" ]]; then
   export UNDER_SCRIPT=1
-  base="$HOME/terminal-logs/$(date +%Y)/$(date +%m)/$(date +%d)"
+  base="__SCHLOG_LOGDIR__/$(date +%Y)/$(date +%m)/$(date +%d)"
   mkdir -p "$base"
   logbase="$base/$(hostname)-$$-$(date +%H%M%S)"
   # util-linux script wants timing as -tFILE (no space)
@@ -10,12 +10,12 @@ if [[ $- == *i* ]] && [[ -t 1 ]] && [[ -z "$UNDER_SCRIPT" ]]; then
 fi
 
 # Optional: add a timestamp + CWD marker before each prompt (safe + idempotent)
-_kautolog_prompt() {
+_schlog_prompt() {
   [[ -n "$logbase" ]] || return 0
   printf "\n# [%s] %s\n" "$(date -Is)" "$(pwd)" >> "$logbase.log" 2>/dev/null
 }
 case "$PROMPT_COMMAND" in
-  *"_kautolog_prompt"*) : ;;
-  *) PROMPT_COMMAND="_kautolog_prompt; $PROMPT_COMMAND" ;;
+  *"_schlog_prompt"*) : ;;
+  *) PROMPT_COMMAND="_schlog_prompt; $PROMPT_COMMAND" ;;
 esac
-# <<< KAUTOLOG END <<<
+# <<< SCHLOG END <<<

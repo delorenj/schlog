@@ -1,5 +1,5 @@
 include LICENSE.txt
 include README.md
 
-recursive-include src/kautolog/templates *.sh *.conf kautolog-replay logrotate_terminal-logs
-recursive-include src/kautolog/templates/systemd *.service *.timer
+recursive-include src/schlog/templates *.sh *.conf schlog-replay logrotate_terminal-logs
+recursive-include src/schlog/templates/systemd *.service *.timer

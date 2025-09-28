@@ -3,7 +3,7 @@ Description=Run autologger rclone sync periodically
 
 [Timer]
 OnBootSec=2m
-OnUnitActiveSec=__KAUTOLOG_INTERVAL__min
+OnUnitActiveSec=__SCHLOG_INTERVAL__min
 Persistent=true
 
 [Install]

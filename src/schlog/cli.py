@@ -4,7 +4,7 @@ from pathlib import Path
 from typing import Optional
 from .installer import install_all, uninstall_all, get_status
 
-app = typer.Typer(add_completion=False, help="Auto-log all terminal sessions on Kali/Linux using script(1).")
+app = typer.Typer(add_completion=False, help="Terminal session auto-logging with script(1), tmux integration, and cloud sync.")
 
 @app.command()
 def install(
@@ -14,7 +14,7 @@ def install(
     with_sync: Optional[str] = typer.Option(None, "--with-sync", help="rclone remote (e.g., remote:terminal-logs)"),
     interval: int = typer.Option(10, help="Sync interval in minutes (systemd user timer)"),
 ):
-    """Install kautolog for the current user (both Bash and Zsh rc files)."""
+    """Install schlog for the current user (both Bash and Zsh rc files)."""
     ok = install_all(
         logdir=logdir,
         enable_tmux=with_tmux,
@@ -26,7 +26,7 @@ def install(
 
 @app.command()
 def uninstall():
-    """Uninstall kautolog for the current user."""
+    """Uninstall schlog for the current user."""
     ok = uninstall_all()
     raise typer.Exit(code=0 if ok else 1)
 
@@ -58,5 +58,5 @@ def replay(
     if target:
         args += ["--target", str(target)]
 
-    replay_script = str(Path.home() / ".local/bin/kautolog-replay")
+    replay_script = str(Path.home() / ".local/bin/schlog-replay")
     subprocess.run([replay_script] + args, check=False)
